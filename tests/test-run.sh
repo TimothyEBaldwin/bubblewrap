@@ -50,7 +50,7 @@ if ${is_uidzero} || test -x `dirname $UNREADABLE`; then
 fi
 
 # https://github.com/projectatomic/bubblewrap/issues/217
-BWRAP_RO_HOST_ARGS="--ro-bind /usr /usr
+BWRAP_RO_HOST_ARGS=(--ro-bind /usr /usr
           --ro-bind /etc /etc
           --dir /var/tmp
           --symlink usr/lib /lib
@@ -58,7 +58,7 @@ BWRAP_RO_HOST_ARGS="--ro-bind /usr /usr
           --symlink usr/bin /bin
           --symlink usr/sbin /sbin
           --proc /proc
-          --dev /dev"
+          --dev /dev)
 
 # Default arg, bind whole host fs to /, tmpfs on /tmp
 RUN="${BWRAP} --bind / / --tmpfs /tmp"
@@ -137,7 +137,7 @@ else
     assert_file_has_content recursive_proc.txt "hello"
     echo "ok - can mount /proc recursively"
 
-    $BWRAP_RECURSE -- $BWRAP --unshare-all  ${BWRAP_RO_HOST_ARGS} findmnt > recursive-newroot.txt
+    $BWRAP_RECURSE -- $BWRAP --unshare-all "${BWRAP_RO_HOST_ARGS[@]}" findmnt > recursive-newroot.txt
     assert_file_has_content recursive-newroot.txt "/usr"
     echo "ok - can pivot to new rootfs recursively"
 fi
