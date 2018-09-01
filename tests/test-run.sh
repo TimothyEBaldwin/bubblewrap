@@ -51,14 +51,18 @@ fi
 
 # https://github.com/projectatomic/bubblewrap/issues/217
 BWRAP_RO_HOST_ARGS=(--ro-bind /usr /usr
-          --ro-bind /etc /etc
           --dir /var/tmp
-          --symlink usr/lib /lib
-          --symlink usr/lib64 /lib64
-          --symlink usr/bin /bin
-          --symlink usr/sbin /sbin
           --proc /proc
           --dev /dev)
+
+for DIR in /etc /lib* /sbin /bin; do
+    if [ -L "$DIR" ]; then
+        BWRAP_RO_HOST_ARGS+=( --symlink "$(readlink "$DIR")" "$DIR" )
+    else
+        BWRAP_RO_HOST_ARGS+=( --ro-bind "$DIR" "$DIR" )
+    fi
+done
+
 
 # Default arg, bind whole host fs to /, tmpfs on /tmp
 RUN="${BWRAP} --bind / / --tmpfs /tmp"
